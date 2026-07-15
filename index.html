@@ -1,0 +1,2197 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>টিশান রিওয়ার্ডস • Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Noto+Sans+Bengali:wght@400;500;600&amp;display=swap');
+        
+        :root {
+            --primary: #6366f1;
+        }
+        
+        body {
+            font-family: 'Inter', 'Noto Sans Bengali', system_ui, sans-serif;
+        }
+        
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            box-shadow: 0 0 0 1px #27251f;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .nav-item {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nav-item.active {
+            color: #6366f1;
+            font-weight: 600;
+        }
+        
+        .coin {
+            animation: coin-pop 0.4s ease forwards;
+        }
+        
+        @keyframes coin-pop {
+            0% { transform: scale(0.8); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .earn-btn {
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
+        }
+        
+        .earn-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .game-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        
+        .task-item {
+            transition: all 0.2s ease;
+        }
+        
+        .modern-card {
+            background: #18181b;
+            border: 1px solid #27251f;
+        }
+        
+        .reward-gradient {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+        }
+        
+        .stat-card {
+            background: #18181b;
+            border: 1px solid #27251f;
+        }
+        
+        .mini-game-area {
+            background: #27251f;
+            border: 2px solid #3f3f46;
+        }
+        
+        .nav-active {
+            background-color: #27251f;
+            border-radius: 9999px;
+        }
+        
+        .notification-item {
+            transition: all 0.2s ease;
+        }
+        
+        .leaderboard-row {
+            transition: background-color 0.2s ease;
+        }
+        
+        .leaderboard-row:hover {
+            background-color: #27251f;
+        }
+        
+        .tishan-logo {
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+        
+        .balance-number {
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .demo-badge {
+            font-size: 10px;
+            padding: 1px 8px;
+            background: #854d0e;
+            color: #fefce8;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-200">
+    <!-- SPLASH SCREEN -->
+    <div id="splash-screen" class="fixed inset-0 bg-zinc-950 z-[100] flex items-center justify-center">
+        <div class="text-center">
+            <div class="w-20 h-20 mx-auto mb-6 rounded-3xl reward-gradient flex items-center justify-center shadow-2xl">
+                <i class="fas fa-tachometer-alt text-white text-5xl"></i>
+            </div>
+            <h1 class="text-5xl font-extrabold tracking-tighter tishan-logo">টিশান</h1>
+            <p class="text-3xl font-bold text-white tracking-tighter -mt-2">রিওয়ার্ডস</p>
+            <div class="mt-8 flex items-center justify-center gap-x-2">
+                <div class="demo-badge px-3 py-1 text-xs font-medium flex items-center gap-x-1">
+                    <i class="fas fa-flask mr-1"></i> 
+                    <span>DEMO v1.0</span>
+                </div>
+            </div>
+            <p class="text-zinc-500 text-sm mt-3">খেলুন • কাজ করুন • কয়েন আয় করুন</p>
+        </div>
+    </div>
+
+    <!-- AUTH SCREEN -->
+    <div id="auth-screen" class="hidden min-h-screen flex items-center justify-center p-6 bg-zinc-950">
+        <div class="w-full max-w-md">
+            <!-- Logo -->
+            <div class="flex justify-center mb-8">
+                <div class="flex items-center gap-x-3">
+                    <div class="w-12 h-12 reward-gradient rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-tachometer-alt text-white text-3xl"></i>
+                    </div>
+                    <div>
+                        <span class="font-extrabold text-4xl tracking-tighter">টিশান</span>
+                        <span class="font-bold text-3xl text-white tracking-tighter">রিওয়ার্ডস</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex bg-zinc-900 rounded-3xl p-1 mb-6 border border-zinc-800">
+                <button onclick="switchAuthTab('login')" id="login-tab"
+                        class="flex-1 py-3 text-sm font-semibold rounded-[2rem] transition-all bg-white text-zinc-900 shadow">লগইন</button>
+                <button onclick="switchAuthTab('register')" id="register-tab"
+                        class="flex-1 py-3 text-sm font-semibold rounded-[2rem] transition-all text-zinc-400">রেজিস্টার</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-form">
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs font-medium text-zinc-400 block mb-1.5">ইমেইল বা ফোন</label>
+                        <input id="login-email" type="text" value="demo@tishan.app" 
+                               class="w-full bg-zinc-900 border border-zinc-800 focus:border-indigo-500 rounded-2xl px-4 py-3.5 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-zinc-400 block mb-1.5">পাসওয়ার্ড</label>
+                        <input id="login-password" type="password" value="demo123" 
+                               class="w-full bg-zinc-900 border border-zinc-800 focus:border-indigo-500 rounded-2xl px-4 py-3.5 text-sm outline-none">
+                    </div>
+                    <button onclick="loginUser()" 
+                            class="w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 transition-colors text-white font-semibold py-4 rounded-3xl text-sm tracking-wider">
+                        লগইন করুন
+                    </button>
+                </div>
+                <p class="text-center text-xs text-zinc-500 mt-5">ডেমো অ্যাকাউন্ট: demo@tishan.app / demo123</p>
+            </div>
+
+            <!-- Register Form -->
+            <div id="register-form" class="hidden">
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs font-medium text-zinc-400 block mb-1.5">নাম</label>
+                            <input id="reg-name" type="text" value="তিশান আহমেদ" 
+                                   class="w-full bg-zinc-900 border border-zinc-800 focus:border-indigo-500 rounded-2xl px-4 py-3.5 text-sm outline-none">
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-zinc-400 block mb-1.5">ফোন নম্বর</label>
+                            <input id="reg-phone" type="tel" value="01712345678" 
+                                   class="w-full bg-zinc-900 border border-zinc-800 focus:border-indigo-500 rounded-2xl px-4 py-3.5 text-sm outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-zinc-400 block mb-1.5">ইমেইল</label>
+                        <input id="reg-email" type="email" value="demo@tishan.app" 
+                               class="w-full bg-zinc-900 border border-zinc-800 focus:border-indigo-500 rounded-2xl px-4 py-3.5 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-zinc-400 block mb-1.5">পাসওয়ার্ড</label>
+                        <input id="reg-password" type="password" value="demo123" 
+                               class="w-full bg-zinc-900 border border-zinc-800 focus:border-indigo-500 rounded-2xl px-4 py-3.5 text-sm outline-none">
+                    </div>
+                    <button onclick="registerUser()" 
+                            class="w-full bg-white hover:bg-zinc-100 active:bg-zinc-200 transition-colors text-zinc-900 font-semibold py-4 rounded-3xl text-sm tracking-wider">
+                        অ্যাকাউন্ট তৈরি করুন
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center">
+                <div class="inline-flex items-center gap-x-2 text-[10px] text-zinc-500">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>নিরাপদ • ফাস্ট • স্কেলেবল</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="main-app" class="hidden app-container bg-zinc-950 min-h-screen relative overflow-hidden">
+        
+        <!-- HEADER -->
+        <div class="sticky top-0 z-50 bg-zinc-950/95 backdrop-blur-xl border-b border-zinc-800 px-4 py-3">
+            <div class="flex items-center justify-between max-w-[480px] mx-auto">
+                <div class="flex items-center gap-x-3">
+                    <div onclick="showPage('home')" class="flex items-center gap-x-2 cursor-pointer">
+                        <div class="w-9 h-9 reward-gradient rounded-2xl flex items-center justify-center shadow-inner">
+                            <i class="fas fa-tachometer-alt text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-2xl tracking-tighter">টিশান</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-x-2">
+                    <!-- Coins Display -->
+                    <div onclick="showPage('wallet')" 
+                         class="flex items-center bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors rounded-3xl pl-1 pr-4 py-1 cursor-pointer">
+                        <div class="w-8 h-8 bg-emerald-500/10 rounded-3xl flex items-center justify-center mr-2">
+                            <i class="fas fa-coins text-emerald-400"></i>
+                        </div>
+                        <div>
+                            <span id="header-coins" class="font-extrabold text-xl tabular-nums">1240</span>
+                            <span class="text-[10px] text-emerald-400 font-medium">কয়েন</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Notification Bell -->
+                    <div onclick="showNotifications()" class="relative w-10 h-10 flex items-center justify-center cursor-pointer hover:bg-zinc-900 rounded-2xl transition-colors">
+                        <i class="fas fa-bell text-xl text-zinc-400"></i>
+                        <span id="notification-badge" 
+                              class="absolute top-1.5 right-1.5 min-w-[15px] h-[15px] px-1 text-[9px] font-bold bg-red-500 text-white rounded-full flex items-center justify-center hidden">3</span>
+                    </div>
+                    
+                    <!-- Profile -->
+                    <div onclick="showPage('profile')" class="w-9 h-9 rounded-2xl overflow-hidden border border-zinc-700 cursor-pointer">
+                        <img id="header-avatar" src="https://i.pravatar.cc/36?img=28" class="w-full h-full object-cover" alt="Profile">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTENT AREA -->
+        <div class="max-w-[480px] mx-auto pb-20" style="min-height: calc(100vh - 140px);">
+            
+            <!-- HOME PAGE -->
+            <div id="page-home" class="section active px-4 pt-5">
+                <div class="mb-6">
+                    <div class="flex items-end justify-between">
+                        <div>
+                            <p class="text-zinc-400 text-sm">স্বাগতম,</p>
+                            <h2 id="home-username" class="text-3xl font-extrabold tracking-tight">তিশান আহমেদ</h2>
+                        </div>
+                        <div class="text-right">
+                            <div class="flex items-center justify-end gap-x-1.5">
+                                <div class="px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-2xl text-xs flex items-center">
+                                    <i class="fas fa-tachometer-alt text-indigo-400 mr-1.5"></i>
+                                    <span id="home-level" class="font-bold">Level 8</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <div class="stat-card rounded-3xl p-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs text-zinc-400">মোট কয়েন</p>
+                                <p id="home-total-coins" class="text-4xl font-extrabold tabular-nums mt-1">1,240</p>
+                            </div>
+                            <i class="fas fa-wallet text-3xl text-emerald-400/70"></i>
+                        </div>
+                        <div class="mt-3 text-xs flex items-center text-emerald-400">
+                            <i class="fas fa-arrow-trend-up mr-1"></i>
+                            <span id="home-earned-today">+180 আজ</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card rounded-3xl p-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs text-zinc-400">লেভেল প্রোগ্রেস</p>
+                                <p id="home-level-text" class="text-4xl font-extrabold tabular-nums mt-1">8/10</p>
+                            </div>
+                            <i class="fas fa-chart-line text-3xl text-violet-400/70"></i>
+                        </div>
+                        <div class="mt-3">
+                            <div class="h-2 bg-zinc-800 rounded-full overflow-hidden">
+                                <div id="home-level-progress" class="h-2 bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all" style="width: 65%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Bonus -->
+                <div onclick="claimDailyBonus()" id="daily-bonus-card"
+                     class="modern-card cursor-pointer rounded-3xl p-5 mb-6 flex items-center justify-between border border-emerald-900/50 hover:border-emerald-700 transition-colors">
+                    <div class="flex items-center gap-x-4">
+                        <div class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-gift text-emerald-400 text-3xl"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold">ডেইলি বোনাস</p>
+                            <p class="text-xs text-emerald-400">আজকের লগইন বোনাস ক্লেইম করুন</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="bg-emerald-500 text-emerald-950 text-xs font-extrabold px-4 py-1.5 rounded-2xl">+50</div>
+                        <p class="text-[10px] text-emerald-400 mt-1">কয়েন</p>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="mb-6">
+                    <p class="text-xs font-semibold text-zinc-400 mb-3 px-1">দ্রুত অ্যাকশন</p>
+                    <div class="grid grid-cols-4 gap-3">
+                        <div onclick="showPage('games')" class="modern-card cursor-pointer rounded-3xl p-4 flex flex-col items-center justify-center text-center hover:border-indigo-500/30 border border-transparent transition-all">
+                            <i class="fas fa-gamepad text-2xl text-indigo-400 mb-2"></i>
+                            <span class="text-xs font-medium">গেমস</span>
+                        </div>
+                        <div onclick="showPage('tasks')" class="modern-card cursor-pointer rounded-3xl p-4 flex flex-col items-center justify-center text-center hover:border-emerald-500/30 border border-transparent transition-all">
+                            <i class="fas fa-tasks text-2xl text-emerald-400 mb-2"></i>
+                            <span class="text-xs font-medium">টাস্ক</span>
+                        </div>
+                        <div onclick="showPage('offerwall')" class="modern-card cursor-pointer rounded-3xl p-4 flex flex-col items-center justify-center text-center hover:border-amber-500/30 border border-transparent transition-all">
+                            <i class="fas fa-handshake text-2xl text-amber-400 mb-2"></i>
+                            <span class="text-xs font-medium">অফারওয়াল</span>
+                        </div>
+                        <div onclick="showPage('referral')" class="modern-card cursor-pointer rounded-3xl p-4 flex flex-col items-center justify-center text-center hover:border-pink-500/30 border border-transparent transition-all">
+                            <i class="fas fa-user-plus text-2xl text-pink-400 mb-2"></i>
+                            <span class="text-xs font-medium">রেফার</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Earnings -->
+                <div>
+                    <div class="flex items-center justify-between mb-3 px-1">
+                        <p class="text-xs font-semibold text-zinc-400">সাম্প্রতিক আয়</p>
+                        <button onclick="showPage('wallet')" class="text-xs text-indigo-400 flex items-center">সব দেখুন <i class="fas fa-chevron-right ml-1 text-xs"></i></button>
+                    </div>
+                    <div id="recent-earnings" class="space-y-2 text-sm">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- GAMES PAGE -->
+            <div id="page-games" class="section px-4 pt-5">
+                <div class="flex items-center justify-between mb-5">
+                    <div>
+                        <h3 class="font-extrabold text-2xl tracking-tight">মিনি গেমস</h3>
+                        <p class="text-xs text-zinc-400">খেলুন, স্কোর করুন, কয়েন জিতুন</p>
+                    </div>
+                    <div class="text-xs bg-zinc-900 px-3 py-1 rounded-2xl border border-zinc-800">দৈনিক লিমিট: ৫</div>
+                </div>
+                
+                <div class="grid grid-cols-1 gap-4">
+                    <!-- Game 1: Tap Frenzy -->
+                    <div onclick="openGameModal('tap')" class="game-card modern-card cursor-pointer rounded-3xl p-5 flex gap-4 items-center border border-zinc-800 hover:border-indigo-500/40">
+                        <div class="w-14 h-14 bg-indigo-500/10 rounded-2xl flex-shrink-0 flex items-center justify-center">
+                            <i class="fas fa-hand-pointer text-indigo-400 text-3xl"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <p class="font-semibold">ট্যাপ ফ্রেনজি</p>
+                                <span class="text-xs px-2.5 py-px bg-indigo-500/10 text-indigo-400 rounded">+১০-১০০</span>
+                            </div>
+                            <p class="text-xs text-zinc-400 mt-0.5">২০ সেকেন্ড • যত দ্রুত সম্ভব ট্যাপ করুন</p>
+                            <div class="flex items-center text-xs text-emerald-400 mt-2">
+                                <i class="fas fa-play mr-1.5"></i> 
+                                <span>আজ খেলা হয়েছে: <span id="tap-plays">2/5</span></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Game 2: Quick Quiz -->
+                    <div onclick="openGameModal('quiz')" class="game-card modern-card cursor-pointer rounded-3xl p-5 flex gap-4 items-center border border-zinc-800 hover:border-emerald-500/40">
+                        <div class="w-14 h-14 bg-emerald-500/10 rounded-2xl flex-shrink-0 flex items-center justify-center">
+                            <i class="fas fa-question-circle text-emerald-400 text-3xl"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <p class="font-semibold">কুইক কুইজ</p>
+                                <span class="text-xs px-2.5 py-px bg-emerald-500/10 text-emerald-400 rounded">+৫০-১৫০</span>
+                            </div>
+                            <p class="text-xs text-zinc-400 mt-0.5">৫ প্রশ্ন • সঠিক উত্তর দিয়ে কয়েন জিতুন</p>
+                            <div class="flex items-center text-xs text-emerald-400 mt-2">
+                                <i class="fas fa-play mr-1.5"></i> 
+                                <span>আজ খেলা হয়েছে: <span id="quiz-plays">1/3</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 px-1">
+                    <p class="text-[10px] text-center text-zinc-500">অ্যান্টি-চিট সিস্টেম চালু আছে • সার্ভার ভেরিফিকেশন</p>
+                </div>
+            </div>
+
+            <!-- DAILY TASKS PAGE -->
+            <div id="page-tasks" class="section px-4 pt-5">
+                <h3 class="font-extrabold text-2xl tracking-tight mb-1">ডেইলি টাস্কস</h3>
+                <p class="text-xs text-zinc-400 mb-5">প্রতিদিনের সহজ কাজ সম্পন্ন করে কয়েন আয় করুন</p>
+                
+                <div id="tasks-list" class="space-y-3">
+                    <!-- Populated dynamically by JS -->
+                </div>
+            </div>
+
+            <!-- OFFERWALL PAGE -->
+            <div id="page-offerwall" class="section px-4 pt-5">
+                <div class="mb-5">
+                    <h3 class="font-extrabold text-2xl tracking-tight">অফারওয়াল</h3>
+                    <p class="text-xs text-zinc-400">পার্টনার অ্যাপ ইনস্টল, সার্ভে ও টাস্ক করে কয়েন আয় করুন</p>
+                </div>
+                
+                <div id="offerwall-list" class="space-y-3">
+                    <!-- Populated by JS -->
+                </div>
+                
+                <div class="mt-5 text-center">
+                    <p class="text-xs text-amber-400 flex items-center justify-center gap-x-1">
+                        <i class="fas fa-info-circle"></i> 
+                        <span>সফল ভেরিফিকেশনের পরই কয়েন যোগ হয়</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- WALLET PAGE -->
+            <div id="page-wallet" class="section px-4 pt-5">
+                <div class="modern-card rounded-3xl p-6 mb-6 text-center border border-zinc-800">
+                    <p class="text-xs tracking-widest text-zinc-400">আপনার ব্যালেন্স</p>
+                    <div class="flex items-baseline justify-center gap-x-1 mt-1">
+                        <span id="wallet-coins" class="font-extrabold text-7xl tabular-nums">1240</span>
+                        <span class="text-2xl font-medium text-emerald-400">কয়েন</span>
+                    </div>
+                    <p class="text-xs text-emerald-400 mt-1">≈ ১২৪ টাকা (ডেমো রেট)</p>
+                    
+                    <div class="grid grid-cols-3 gap-3 mt-6 text-xs">
+                        <div>
+                            <p class="text-zinc-400">মোট আয়</p>
+                            <p id="wallet-total-earned" class="font-extrabold text-xl">8,450</p>
+                        </div>
+                        <div>
+                            <p class="text-zinc-400">উইথড্র</p>
+                            <p id="wallet-total-withdrawn" class="font-extrabold text-xl">2,100</p>
+                        </div>
+                        <div>
+                            <p class="text-zinc-400">পেন্ডিং</p>
+                            <p id="wallet-pending" class="font-extrabold text-xl text-amber-400">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <button onclick="showPage('withdraw')" 
+                        class="w-full py-4 bg-white text-zinc-900 font-extrabold tracking-wider rounded-3xl flex items-center justify-center gap-x-2 active:scale-[0.985] transition">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>উইথড্র রিকোয়েস্ট করুন</span>
+                </button>
+                
+                <div class="mt-7">
+                    <div class="flex items-center justify-between mb-3 px-1">
+                        <p class="font-semibold text-sm">ট্রানজেকশন হিস্ট্রি</p>
+                    </div>
+                    <div id="transaction-list" class="space-y-2 text-sm">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- WITHDRAW PAGE -->
+            <div id="page-withdraw" class="section px-4 pt-5">
+                <h3 class="font-extrabold text-2xl tracking-tight mb-1">উইথড্র</h3>
+                <p class="text-xs text-zinc-400 mb-5">মোবাইল রিচার্জ নিন • মিনিমাম ২০ টাকা</p>
+                
+                <div class="space-y-3 mb-6">
+                    <!-- Withdraw Options -->
+                    <div onclick="selectWithdrawOption(20, 200)" class="modern-card cursor-pointer rounded-3xl p-4 flex items-center justify-between border border-zinc-800 hover:border-emerald-600 transition-colors">
+                        <div>
+                            <span class="font-extrabold text-2xl">২০</span> <span class="text-sm">টাকা রিচার্জ</span>
+                            <p class="text-xs text-emerald-400">২০০ কয়েন</p>
+                        </div>
+                        <i class="fas fa-mobile-alt text-3xl text-emerald-400/60"></i>
+                    </div>
+                    
+                    <div onclick="selectWithdrawOption(50, 500)" class="modern-card cursor-pointer rounded-3xl p-4 flex items-center justify-between border border-zinc-800 hover:border-emerald-600 transition-colors">
+                        <div>
+                            <span class="font-extrabold text-2xl">৫০</span> <span class="text-sm">টাকা রিচার্জ</span>
+                            <p class="text-xs text-emerald-400">৫০০ কয়েন</p>
+                        </div>
+                        <i class="fas fa-mobile-alt text-3xl text-emerald-400/60"></i>
+                    </div>
+                    
+                    <div onclick="selectWithdrawOption(100, 1000)" class="modern-card cursor-pointer rounded-3xl p-4 flex items-center justify-between border border-zinc-800 hover:border-emerald-600 transition-colors">
+                        <div>
+                            <span class="font-extrabold text-2xl">১০০</span> <span class="text-sm">টাকা রিচার্জ</span>
+                            <p class="text-xs text-emerald-400">১০০০ কয়েন</p>
+                        </div>
+                        <i class="fas fa-mobile-alt text-3xl text-emerald-400/60"></i>
+                    </div>
+                </div>
+                
+                <div id="withdraw-form" class="hidden modern-card rounded-3xl p-5 border border-zinc-800">
+                    <p class="font-semibold mb-3">রিচার্জ ডিটেইলস</p>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs text-zinc-400">মোবাইল নম্বর</label>
+                            <input id="withdraw-mobile" type="tel" value="01712345678" class="mt-1 w-full bg-zinc-900 border border-zinc-700 rounded-2xl px-4 py-3 text-sm">
+                        </div>
+                        
+                        <div>
+                            <label class="text-xs text-zinc-400">অপারেটর</label>
+                            <select id="withdraw-operator" class="mt-1 w-full bg-zinc-900 border border-zinc-700 rounded-2xl px-4 py-3 text-sm">
+                                <option>গ্রামীণফোন</option>
+                                <option>বাংলালিংক</option>
+                                <option>রবি</option>
+                                <option>এয়ারটেল</option>
+                                <option>টেলিটক</option>
+                            </select>
+                        </div>
+                        
+                        <div class="flex items-center justify-between pt-2">
+                            <div>
+                                <span class="text-xs text-zinc-400">পরিমাণ:</span>
+                                <span id="withdraw-amount-text" class="font-extrabold ml-1">২০ টাকা</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-zinc-400">কয়েন কাটা হবে:</span>
+                                <span id="withdraw-coins-text" class="font-extrabold ml-1 text-emerald-400">200</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-3 pt-3">
+                            <button onclick="cancelWithdraw()" class="flex-1 py-3.5 text-sm font-medium bg-zinc-800 hover:bg-zinc-700 rounded-2xl">বাতিল</button>
+                            <button onclick="submitWithdrawRequest()" class="flex-1 py-3.5 text-sm font-extrabold bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl">রিকোয়েস্ট সাবমিট করুন</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REFERRAL PAGE -->
+            <div id="page-referral" class="section px-4 pt-5">
+                <div class="modern-card rounded-3xl p-6 mb-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs text-pink-400 font-medium">আপনার রেফারেল কোড</p>
+                            <p id="referral-code" class="font-extrabold text-4xl tracking-[3px] mt-1 text-white">TISHAN8X9K</p>
+                        </div>
+                        <button onclick="copyReferralCode()" class="px-5 py-2 text-xs font-semibold bg-pink-600 hover:bg-pink-500 text-white rounded-2xl flex items-center gap-x-2">
+                            <i class="fas fa-copy"></i> <span>কপি</span>
+                        </button>
+                    </div>
+                    
+                    <div class="mt-5 pt-5 border-t border-zinc-800 text-xs">
+                        <div class="flex justify-between text-zinc-400">
+                            <span>রেফার করা বন্ধু</span>
+                            <span class="font-bold text-white" id="referral-count">7 জন</span>
+                        </div>
+                        <div class="flex justify-between text-zinc-400 mt-2">
+                            <span>রেফারেল থেকে আয়</span>
+                            <span class="font-bold text-emerald-400" id="referral-earned">+৭০০ কয়েন</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button onclick="simulateReferralJoin()" 
+                        class="w-full py-4 bg-pink-600 hover:bg-pink-500 active:bg-pink-700 transition-colors rounded-3xl font-extrabold text-sm flex items-center justify-center gap-x-2">
+                    <i class="fas fa-user-plus"></i>
+                    <span>সিমুলেট করুন: নতুন বন্ধু জয়েন করেছে</span>
+                </button>
+                
+                <p class="text-center text-xs text-zinc-500 mt-4 px-4">নতুন ইউজার আপনার কোড দিয়ে জয়েন করলে আপনি ১০০ কয়েন পাবেন (ভেরিফাইড হওয়ার পর)</p>
+            </div>
+
+            <!-- LEADERBOARD PAGE -->
+            <div id="page-leaderboard" class="section px-4 pt-5">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-extrabold text-2xl tracking-tight">লিডারবোর্ড</h3>
+                    <div class="flex text-xs bg-zinc-900 border border-zinc-800 rounded-2xl p-0.5">
+                        <div onclick="switchLeaderboardTab(this, 'daily')" class="leaderboard-tab active px-4 py-1 rounded-[14px] cursor-pointer font-medium">ডেইলি</div>
+                        <div onclick="switchLeaderboardTab(this, 'weekly')" class="leaderboard-tab px-4 py-1 rounded-[14px] cursor-pointer font-medium text-zinc-400">উইকলি</div>
+                        <div onclick="switchLeaderboardTab(this, 'monthly')" class="leaderboard-tab px-4 py-1 rounded-[14px] cursor-pointer font-medium text-zinc-400">মান্থলি</div>
+                    </div>
+                </div>
+                
+                <div id="leaderboard-list" class="space-y-2">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- PROFILE PAGE -->
+            <div id="page-profile" class="section px-4 pt-5">
+                <div class="flex flex-col items-center mb-8">
+                    <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-zinc-800 mb-4">
+                        <img id="profile-avatar" src="https://i.pravatar.cc/96?img=28" class="w-full h-full object-cover">
+                    </div>
+                    <h3 id="profile-name" class="font-extrabold text-3xl">তিশান আহমেদ</h3>
+                    <p id="profile-email" class="text-sm text-zinc-400">demo@tishan.app</p>
+                    
+                    <div class="mt-3 px-4 py-1 bg-zinc-900 border border-zinc-700 rounded-3xl text-xs flex items-center gap-x-2">
+                        <i class="fas fa-calendar text-xs"></i>
+                        <span id="profile-joined">জয়েন করেছেন: ১২ জানুয়ারি ২০২৬</span>
+                    </div>
+                </div>
+                
+                <div class="modern-card rounded-3xl p-5 mb-6">
+                    <div class="grid grid-cols-2 gap-y-5 text-sm">
+                        <div>
+                            <span class="text-xs text-zinc-400">মোট কয়েন</span>
+                            <p id="profile-coins" class="font-extrabold text-3xl tabular-nums">1240</p>
+                        </div>
+                        <div>
+                            <span class="text-xs text-zinc-400">লেভেল</span>
+                            <p id="profile-level" class="font-extrabold text-3xl">8</p>
+                        </div>
+                        <div>
+                            <span class="text-xs text-zinc-400">রেফারেল কোড</span>
+                            <p id="profile-ref-code" class="font-extrabold text-xl tracking-wider">TISHAN8X9K</p>
+                        </div>
+                        <div>
+                            <span class="text-xs text-zinc-400">মোট আয়</span>
+                            <p id="profile-total-earned" class="font-extrabold text-3xl tabular-nums">8450</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-2">
+                    <button onclick="showAdminPanel()" class="w-full flex items-center justify-center gap-x-2 py-3.5 text-sm font-medium bg-zinc-900 hover:bg-zinc-800 rounded-2xl border border-zinc-700">
+                        <i class="fas fa-user-shield"></i>
+                        <span>অ্যাডমিন প্যানেল (ডেমো)</span>
+                    </button>
+                    
+                    <button onclick="logoutUser()" class="w-full flex items-center justify-center gap-x-2 py-3.5 text-sm font-medium text-red-400 hover:bg-red-950/30 rounded-2xl">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>লগআউট</span>
+                    </button>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- BOTTOM NAV -->
+        <div class="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto bg-zinc-900/95 backdrop-blur-xl border-t border-zinc-800 px-1 py-2 z-50">
+            <div class="flex justify-around text-xs">
+                <div onclick="showPage('home')" class="nav-item flex flex-col items-center px-5 py-1 cursor-pointer text-center" id="nav-home">
+                    <i class="fas fa-home text-xl mb-0.5"></i>
+                    <span class="text-[10px] font-medium">হোম</span>
+                </div>
+                <div onclick="showPage('games')" class="nav-item flex flex-col items-center px-5 py-1 cursor-pointer text-center" id="nav-games">
+                    <i class="fas fa-gamepad text-xl mb-0.5"></i>
+                    <span class="text-[10px] font-medium">গেমস</span>
+                </div>
+                <div onclick="showPage('tasks')" class="nav-item flex flex-col items-center px-5 py-1 cursor-pointer text-center" id="nav-tasks">
+                    <i class="fas fa-tasks text-xl mb-0.5"></i>
+                    <span class="text-[10px] font-medium">টাস্ক</span>
+                </div>
+                <div onclick="showPage('offerwall')" class="nav-item flex flex-col items-center px-5 py-1 cursor-pointer text-center" id="nav-offerwall">
+                    <i class="fas fa-handshake text-xl mb-0.5"></i>
+                    <span class="text-[10px] font-medium">অফার</span>
+                </div>
+                <div onclick="showPage('wallet')" class="nav-item flex flex-col items-center px-5 py-1 cursor-pointer text-center" id="nav-wallet">
+                    <i class="fas fa-wallet text-xl mb-0.5"></i>
+                    <span class="text-[10px] font-medium">ওয়ালেট</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GAME MODAL -->
+    <div id="game-modal" onclick="if (event.target.id === 'game-modal') closeGameModal()" class="hidden fixed inset-0 bg-black/70 z-[90] flex items-end justify-center">
+        <div onclick="event.stopImmediatePropagation()" class="bg-zinc-900 w-full max-w-[480px] rounded-t-3xl p-5 pb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="game-modal-title" class="font-extrabold text-2xl"></h3>
+                <button onclick="closeGameModal()" class="text-3xl leading-none text-zinc-400 hover:text-white">&times;</button>
+            </div>
+            
+            <!-- TAP GAME -->
+            <div id="tap-game-content">
+                <div class="text-center mb-4">
+                    <p class="text-xs text-zinc-400">২০ সেকেন্ডের মধ্যে যত বেশি ট্যাপ করতে পারেন</p>
+                </div>
+                
+                <div class="mini-game-area rounded-3xl p-6 mb-4 text-center">
+                    <div id="tap-timer" class="font-extrabold text-7xl tabular-nums text-white mb-1">20</div>
+                    <p class="text-xs tracking-widest text-zinc-400">সেকেন্ড বাকি</p>
+                    
+                    <div onclick="tapGameClick()" id="tap-button"
+                         class="mt-5 mx-auto w-40 h-40 bg-gradient-to-br from-indigo-500 to-violet-600 active:from-indigo-600 active:to-violet-700 transition-all shadow-inner rounded-full flex items-center justify-center cursor-pointer select-none">
+                        <div class="text-center">
+                            <i class="fas fa-hand-pointer text-white text-6xl mb-1"></i>
+                            <p class="text-white text-xs font-bold tracking-widest">TAP!</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <span class="text-xs text-zinc-400">আপনার স্কোর:</span>
+                        <span id="tap-score" class="font-extrabold text-4xl tabular-nums ml-2">0</span>
+                    </div>
+                </div>
+                
+                <button onclick="startTapGame()" id="tap-start-btn"
+                        class="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold rounded-3xl">গেম শুরু করুন</button>
+            </div>
+            
+            <!-- QUIZ GAME -->
+            <div id="quiz-game-content" class="hidden">
+                <div class="mb-4">
+                    <div class="flex justify-between text-xs mb-1.5 px-1">
+                        <span id="quiz-progress">প্রশ্ন ১/৫</span>
+                        <span id="quiz-score">স্কোর: 0</span>
+                    </div>
+                    <div class="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                        <div id="quiz-progress-bar" class="h-1.5 bg-emerald-500 transition-all rounded-full" style="width: 20%"></div>
+                    </div>
+                </div>
+                
+                <div id="quiz-question" class="font-semibold text-xl leading-tight min-h-[70px]"></div>
+                
+                <div id="quiz-options" class="mt-5 space-y-2.5">
+                    <!-- Options populated by JS -->
+                </div>
+            </div>
+            
+            <div id="game-result" class="hidden text-center py-4">
+                <div class="mx-auto w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mb-3">
+                    <i class="fas fa-trophy text-emerald-400 text-4xl"></i>
+                </div>
+                <p class="font-extrabold text-2xl" id="game-result-text"></p>
+                <p class="text-emerald-400 mt-1 text-sm" id="game-result-coins"></p>
+                
+                <button onclick="closeGameModal()" class="mt-6 w-full py-3 bg-white text-zinc-900 font-extrabold rounded-3xl">বন্ধ করুন</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- NOTIFICATIONS MODAL -->
+    <div id="notifications-modal" onclick="if (event.target.id === 'notifications-modal') hideNotifications()" class="hidden fixed inset-0 bg-black/60 z-[95] flex items-end">
+        <div onclick="event.stopImmediatePropagation()" class="bg-zinc-900 w-full max-w-[480px] mx-auto rounded-t-3xl p-5 max-h-[70vh] overflow-auto">
+            <div class="flex justify-between items-center mb-4 px-1">
+                <h4 class="font-extrabold">নোটিফিকেশন</h4>
+                <button onclick="hideNotifications()" class="text-xl">&times;</button>
+            </div>
+            <div id="notifications-list" class="space-y-2 text-sm">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- ADMIN PANEL MODAL -->
+    <div id="admin-modal" onclick="if (event.target.id === 'admin-modal') hideAdminPanel()" class="hidden fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-4">
+        <div onclick="event.stopImmediatePropagation()" class="bg-zinc-900 w-full max-w-md rounded-3xl p-6">
+            <div class="flex justify-between mb-5">
+                <h3 class="font-extrabold text-xl">অ্যাডমিন প্যানেল</h3>
+                <button onclick="hideAdminPanel()" class="text-2xl leading-none">&times;</button>
+            </div>
+            
+            <div class="mb-4">
+                <p class="text-xs text-zinc-400 mb-2">পেন্ডিং উইথড্র রিকোয়েস্টস</p>
+                <div id="admin-withdraw-list" class="space-y-2 text-xs max-h-[200px] overflow-auto">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+            
+            <div class="text-[10px] text-center text-zinc-500 pt-3 border-t border-zinc-800">
+                ডেমো অ্যাডমিন • সব অ্যাকশন সিমুলেটেড
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ==================== TAILWIND CONFIG ====================
+        function initTailwind() {
+            document.documentElement.style.setProperty('--accent', '#6366f1');
+        }
+        
+        // ==================== GLOBAL STATE ====================
+        let currentUser = null;
+        let transactions = [];
+        let dailyCompleted = {};
+        let gamePlays = { tap: 0, quiz: 0 };
+        let notifications = [];
+        let withdrawRequests = [];
+        let completedOffers = [];
+        
+        const DAILY_TASKS = [
+            { id: 'daily_login', title: 'ডেইলি লগইন', desc: 'আজকে অ্যাপে লগইন করুন', coins: 50 },
+            { id: 'play_one_game', title: 'একটা গেম খেলুন', desc: 'যেকোনো একটা মিনি গেম সম্পন্ন করুন', coins: 80 },
+            { id: 'complete_offer', title: 'একটা অফার সম্পন্ন করুন', desc: 'অফারওয়াল থেকে একটা টাস্ক করুন', coins: 120 },
+            { id: 'referral_share', title: 'রেফারেল শেয়ার করুন', desc: 'আপনার রেফারেল কোড শেয়ার করুন', coins: 40 }
+        ];
+        
+        const OFFERWALL_OFFERS = [
+            { id: 'offer1', title: 'MyCash অ্যাপ ইনস্টল করুন', desc: 'নতুন অ্যাপ ইনস্টল + সাইনআপ', coins: 250, type: 'install' },
+            { id: 'offer2', title: 'সার্ভে পূরণ করুন', desc: '৫ মিনিটের সার্ভে • মোবাইল সম্পর্কিত', coins: 180, type: 'survey' },
+            { id: 'offer3', title: 'Foodpanda অর্ডার দিন', desc: 'প্রথম অর্ডারে ১৫% ক্যাশব্যাক', coins: 320, type: 'install' },
+            { id: 'offer4', title: 'নতুন গেম ডাউনলোড', desc: 'Level 5 পর্যন্ত খেলুন', coins: 150, type: 'install' }
+        ];
+        
+        const QUIZ_QUESTIONS = [
+            {
+                q: "বাংলাদেশের জাতীয় ফুল কী?",
+                options: ["শাপলা", "গোলাপ", "জবা", "বেলি"],
+                correct: 0
+            },
+            {
+                q: "মোবাইল রিচার্জের জন্য সবচেয়ে জনপ্রিয় অপারেটর কোনটি?",
+                options: ["গ্রামীণফোন", "বাংলালিংক", "রবি", "এয়ারটেল"],
+                correct: 0
+            },
+            {
+                q: "কয়েন কীভাবে আয় করা যায়?",
+                options: ["গেম খেলে", "টাস্ক করে", "অফারওয়ালে", "সবগুলো"],
+                correct: 3
+            },
+            {
+                q: "টিশান রিওয়ার্ডস-এ মিনিমাম উইথড্র কত?",
+                options: ["১০ টাকা", "২০ টাকা", "৫০ টাকা", "১০০ টাকা"],
+                correct: 1
+            },
+            {
+                q: "রেফারেল বোনাস কত কয়েন?",
+                options: ["৫০ কয়েন", "১০০ কয়েন", "২০০ কয়েন", "৫০০ কয়েন"],
+                correct: 1
+            }
+        ];
+        
+        let currentQuiz = { index: 0, score: 0, answers: [] };
+        let currentTapGame = { score: 0, timer: null, timeLeft: 20, running: false };
+        let selectedWithdraw = { amountTaka: 0, coins: 0 };
+        
+        // ==================== UTILITY FUNCTIONS ====================
+        function saveData() {
+            if (!currentUser) return;
+            
+            const data = {
+                currentUser,
+                transactions,
+                dailyCompleted,
+                gamePlays,
+                notifications: notifications.slice(0, 30),
+                withdrawRequests,
+                completedOffers
+            };
+            localStorage.setItem('tishan_user_data', JSON.stringify(data));
+        }
+        
+        function loadData() {
+            const saved = localStorage.getItem('tishan_user_data');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    currentUser = data.currentUser;
+                    transactions = data.transactions || [];
+                    dailyCompleted = data.dailyCompleted || {};
+                    gamePlays = data.gamePlays || { tap: 0, quiz: 0 };
+                    notifications = data.notifications || [];
+                    withdrawRequests = data.withdrawRequests || [];
+                    completedOffers = data.completedOffers || [];
+                } catch (e) {
+                    console.error('Failed to load data', e);
+                }
+            }
+        }
+        
+        function generateReferralCode() {
+            return 'TISHAN' + Math.random().toString(36).substring(2, 7).toUpperCase();
+        }
+        
+        function addNotification(message, type = 'reward') {
+            const notif = {
+                id: Date.now(),
+                message,
+                type,
+                time: new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }),
+                date: new Date().toISOString()
+            };
+            notifications.unshift(notif);
+            if (notifications.length > 30) notifications.pop();
+            
+            updateNotificationBadge();
+            saveData();
+        }
+        
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notification-badge');
+            if (!badge) return;
+            
+            if (notifications.length > 0) {
+                badge.textContent = notifications.length > 9 ? '9+' : notifications.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+        
+        function earnCoins(amount, source = 'অ্যাক্টিভিটি') {
+            if (!currentUser) return;
+            
+            currentUser.coins = (currentUser.coins || 0) + amount;
+            currentUser.totalEarned = (currentUser.totalEarned || 0) + amount;
+            
+            // Add transaction
+            transactions.unshift({
+                id: Date.now(),
+                type: 'earn',
+                amount: amount,
+                desc: source,
+                date: new Date().toISOString()
+            });
+            
+            // Level up check
+            const newLevel = 1 + Math.floor((currentUser.totalEarned || 0) / 500);
+            if (newLevel > currentUser.level) {
+                currentUser.level = newLevel;
+                addNotification(`অভিনন্দন! আপনি Level ${newLevel} এ উন্নীত হয়েছেন 🎉`, 'level');
+            }
+            
+            addNotification(`+${amount} কয়েন পেয়েছেন (${source})`, 'reward');
+            
+            updateAllUI();
+            saveData();
+            
+            // Small confetti effect
+            createConfetti();
+        }
+        
+        function createConfetti() {
+            const colors = ['#6366f1', '#a855f7', '#10b981'];
+            for (let i = 0; i < 25; i++) {
+                const conf = document.createElement('div');
+                conf.style.position = 'fixed';
+                conf.style.zIndex = '99999';
+                conf.style.width = '8px';
+                conf.style.height = '8px';
+                conf.style.borderRadius = '50%';
+                conf.style.background = colors[Math.floor(Math.random() * colors.length)];
+                conf.style.left = Math.random() * window.innerWidth + 'px';
+                conf.style.top = '-10px';
+                conf.style.opacity = Math.random() + 0.6;
+                document.body.appendChild(conf);
+                
+                const duration = Math.random() * 2500 + 1800;
+                const angle = Math.random() * 60 + 30;
+                
+                conf.animate([
+                    { transform: `translateY(0) rotate(0deg)`, opacity: conf.style.opacity },
+                    { transform: `translateY(${window.innerHeight + 100}px) rotate(${angle * 5}deg)`, opacity: 0 }
+                ], {
+                    duration: duration,
+                    easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)'
+                }).onfinish = () => conf.remove();
+            }
+        }
+        
+        function addTransaction(type, amount, desc) {
+            transactions.unshift({
+                id: Date.now(),
+                type,
+                amount,
+                desc,
+                date: new Date().toISOString()
+            });
+            if (transactions.length > 50) transactions.pop();
+            saveData();
+        }
+        
+        // ==================== UI UPDATE ====================
+        function updateAllUI() {
+            if (!currentUser) return;
+            
+            // Header coins
+            const headerCoins = document.getElementById('header-coins');
+            if (headerCoins) headerCoins.textContent = currentUser.coins.toLocaleString();
+            
+            // Home page
+            const homeUsername = document.getElementById('home-username');
+            if (homeUsername) homeUsername.textContent = currentUser.name || 'ব্যবহারকারী';
+            
+            const homeLevel = document.getElementById('home-level');
+            if (homeLevel) homeLevel.innerHTML = `Level ${currentUser.level || 1}`;
+            
+            const homeTotalCoins = document.getElementById('home-total-coins');
+            if (homeTotalCoins) homeTotalCoins.textContent = (currentUser.coins || 0).toLocaleString();
+            
+            // Level progress
+            const totalEarned = currentUser.totalEarned || 0;
+            const levelProgress = ((totalEarned % 500) / 500) * 100;
+            const progressBar = document.getElementById('home-level-progress');
+            if (progressBar) progressBar.style.width = `${levelProgress}%`;
+            
+            const levelText = document.getElementById('home-level-text');
+            if (levelText) levelText.textContent = `${currentUser.level || 1}/10`;
+            
+            // Dynamic "Earned Today"
+            const todayStr = new Date().toDateString();
+            let earnedToday = 0;
+            transactions.forEach(tx => {
+                if (tx.type === 'earn' && new Date(tx.date).toDateString() === todayStr) {
+                    earnedToday += tx.amount || 0;
+                }
+            });
+            const earnedTodayEl = document.getElementById('home-earned-today');
+            if (earnedTodayEl) earnedTodayEl.textContent = `+${earnedToday} আজ`;
+            
+            // Recent earnings
+            updateRecentEarnings();
+            
+            // Wallet
+            updateWalletUI();
+            
+            // Profile
+            updateProfileUI();
+            
+            // Update game play counts
+            updateGamePlayCounts();
+            
+            // Tasks
+            renderDailyTasks();
+            
+            // Offerwall
+            renderOfferwall();
+            
+            // Leaderboard
+            renderLeaderboard();
+            
+            // Notification badge
+            updateNotificationBadge();
+        }
+        
+        function updateRecentEarnings() {
+            const container = document.getElementById('recent-earnings');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const recent = transactions.slice(0, 4);
+            
+            if (recent.length === 0) {
+                container.innerHTML = `<div class="text-xs text-zinc-500 px-1">এখনো কোনো আয় নেই। গেম খেলুন বা টাস্ক করুন!</div>`;
+                return;
+            }
+            
+            recent.forEach(tx => {
+                if (tx.type !== 'earn') return;
+                
+                const div = document.createElement('div');
+                div.className = `flex items-center justify-between bg-zinc-900 border border-zinc-800 px-4 py-3 rounded-2xl text-sm`;
+                div.innerHTML = `
+                    <div class="flex items-center gap-x-3">
+                        <div class="w-8 h-8 bg-emerald-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-coins text-emerald-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="font-medium">${tx.desc}</div>
+                            <div class="text-xs text-zinc-500">${new Date(tx.date).toLocaleDateString('bn-BD')}</div>
+                        </div>
+                    </div>
+                    <div class="font-extrabold text-emerald-400">+${tx.amount}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        function updateWalletUI() {
+            const coinsEl = document.getElementById('wallet-coins');
+            if (coinsEl) coinsEl.textContent = (currentUser.coins || 0).toLocaleString();
+            
+            const earnedEl = document.getElementById('wallet-total-earned');
+            if (earnedEl) earnedEl.textContent = (currentUser.totalEarned || 0).toLocaleString();
+            
+            const withdrawnEl = document.getElementById('wallet-total-withdrawn');
+            if (withdrawnEl) {
+                const totalWithdrawn = transactions.filter(t => t.type === 'withdraw' && t.status !== 'rejected')
+                    .reduce((sum, t) => sum + (t.amount || 0), 0);
+                withdrawnEl.textContent = totalWithdrawn.toLocaleString();
+            }
+            
+            const pendingEl = document.getElementById('wallet-pending');
+            if (pendingEl) {
+                const pending = withdrawRequests.filter(r => r.status === 'pending').length;
+                pendingEl.textContent = pending;
+            }
+            
+            // Transaction history
+            const txContainer = document.getElementById('transaction-list');
+            if (!txContainer) return;
+            
+            txContainer.innerHTML = '';
+            
+            const recentTx = transactions.slice(0, 6);
+            
+            if (recentTx.length === 0) {
+                txContainer.innerHTML = `<p class="text-xs text-zinc-500 px-2">কোনো ট্রানজেকশন নেই</p>`;
+                return;
+            }
+            
+            recentTx.forEach(tx => {
+                const isEarn = tx.type === 'earn';
+                const div = document.createElement('div');
+                div.className = `flex justify-between items-center px-4 py-[13px] rounded-2xl ${isEarn ? 'bg-emerald-950/30' : 'bg-zinc-900'}`;
+                
+                let icon = isEarn ? 'fa-coins text-emerald-400' : 'fa-money-bill-wave text-amber-400';
+                let sign = isEarn ? '+' : '';
+                
+                div.innerHTML = `
+                    <div class="flex items-center gap-x-3">
+                        <i class="fas ${icon} w-4"></i>
+                        <div>
+                            <div class="text-sm font-medium">${tx.desc}</div>
+                            <div class="text-xs text-zinc-500">${new Date(tx.date).toLocaleDateString('bn-BD', {month:'short', day:'numeric'})}</div>
+                        </div>
+                    </div>
+                    <div class="font-extrabold ${isEarn ? 'text-emerald-400' : 'text-amber-400'}">${sign}${tx.amount || ''}</div>
+                `;
+                txContainer.appendChild(div);
+            });
+        }
+        
+        function updateProfileUI() {
+            if (!currentUser) return;
+            
+            const nameEl = document.getElementById('profile-name');
+            if (nameEl) nameEl.textContent = currentUser.name || 'ব্যবহারকারী';
+            
+            const emailEl = document.getElementById('profile-email');
+            if (emailEl) emailEl.textContent = currentUser.email || '';
+            
+            const coinsEl = document.getElementById('profile-coins');
+            if (coinsEl) coinsEl.textContent = (currentUser.coins || 0).toLocaleString();
+            
+            const levelEl = document.getElementById('profile-level');
+            if (levelEl) levelEl.textContent = currentUser.level || 1;
+            
+            const refEl = document.getElementById('profile-ref-code');
+            if (refEl) refEl.textContent = currentUser.referralCode || '------';
+            
+            const totalEl = document.getElementById('profile-total-earned');
+            if (totalEl) totalEl.textContent = (currentUser.totalEarned || 0).toLocaleString();
+            
+            const joinedEl = document.getElementById('profile-joined');
+            if (joinedEl && currentUser.joined) {
+                joinedEl.textContent = `জয়েন করেছেন: ${new Date(currentUser.joined).toLocaleDateString('bn-BD')}`;
+            }
+            
+            // Header avatar
+            const headerAvatar = document.getElementById('header-avatar');
+            if (headerAvatar && currentUser.avatar) {
+                headerAvatar.src = currentUser.avatar;
+            }
+        }
+        
+        function updateGamePlayCounts() {
+            const tapEl = document.getElementById('tap-plays');
+            if (tapEl) tapEl.textContent = `${gamePlays.tap || 0}/5`;
+            
+            const quizEl = document.getElementById('quiz-plays');
+            if (quizEl) quizEl.textContent = `${gamePlays.quiz || 0}/3`;
+        }
+        
+        // ==================== PAGE NAVIGATION ====================
+        function showPage(page) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            
+            // Show target
+            const target = document.getElementById(`page-${page}`);
+            if (target) target.classList.add('active');
+            
+            // Update nav active state
+            document.querySelectorAll('[id^="nav-"]').forEach(nav => nav.classList.remove('active', 'text-indigo-400'));
+            
+            const activeNav = document.getElementById(`nav-${page}`);
+            if (activeNav) {
+                activeNav.classList.add('active', 'text-indigo-400');
+            }
+            
+            // Special actions per page
+            if (page === 'tasks') renderDailyTasks();
+            if (page === 'offerwall') renderOfferwall();
+            if (page === 'leaderboard') renderLeaderboard();
+            if (page === 'wallet') updateWalletUI();
+        }
+        
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const loginTab = document.getElementById('login-tab');
+            const registerTab = document.getElementById('register-tab');
+            
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                loginTab.classList.add('bg-white', 'text-zinc-900', 'shadow');
+                loginTab.classList.remove('text-zinc-400');
+                registerTab.classList.remove('bg-white', 'text-zinc-900', 'shadow');
+                registerTab.classList.add('text-zinc-400');
+            } else {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                registerTab.classList.add('bg-white', 'text-zinc-900', 'shadow');
+                registerTab.classList.remove('text-zinc-400');
+                loginTab.classList.remove('bg-white', 'text-zinc-900', 'shadow');
+                loginTab.classList.add('text-zinc-400');
+            }
+        }
+        
+        // ==================== AUTH ====================
+        function loginUser() {
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                alert('ইমেইল ও পাসওয়ার্ড দিন');
+                return;
+            }
+            
+            // Demo login - in real would verify with Firebase
+            if (email === 'demo@tishan.app' && password === 'demo123') {
+                // Load or create demo user
+                loadData();
+                
+                if (!currentUser) {
+                    currentUser = {
+                        id: 'demo_user_001',
+                        name: 'তিশান আহমেদ',
+                        email: 'demo@tishan.app',
+                        phone: '01712345678',
+                        coins: 1240,
+                        totalEarned: 8450,
+                        level: 8,
+                        referralCode: 'TISHAN8X9K',
+                        joined: '2026-01-12T10:30:00Z',
+                        avatar: 'https://i.pravatar.cc/96?img=28'
+                    };
+                    transactions = [
+                        {id: 1, type: 'earn', amount: 180, desc: 'ডেইলি বোনাস', date: new Date(Date.now() - 3600000).toISOString()},
+                        {id: 2, type: 'earn', amount: 250, desc: 'MyCash অ্যাপ ইনস্টল', date: new Date(Date.now() - 7200000).toISOString()}
+                    ];
+                    saveData();
+                }
+                
+                // Show main app
+                enterApp();
+            } else {
+                // Allow any login for demo
+                loadData();
+                
+                if (!currentUser) {
+                    currentUser = {
+                        id: 'user_' + Date.now(),
+                        name: email.split('@')[0],
+                        email: email,
+                        phone: '01700000000',
+                        coins: 350,
+                        totalEarned: 1250,
+                        level: 3,
+                        referralCode: generateReferralCode(),
+                        joined: new Date().toISOString(),
+                        avatar: `https://i.pravatar.cc/96?img=${Math.floor(Math.random()*70)}`
+                    };
+                    saveData();
+                }
+                
+                enterApp();
+            }
+        }
+        
+        function registerUser() {
+            const name = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const phone = document.getElementById('reg-phone').value.trim();
+            
+            if (!name || !email || !password) {
+                alert('সব তথ্য পূরণ করুন');
+                return;
+            }
+            
+            currentUser = {
+                id: 'user_' + Date.now(),
+                name: name,
+                email: email,
+                phone: phone,
+                coins: 150, // Welcome bonus
+                totalEarned: 150,
+                level: 1,
+                referralCode: generateReferralCode(),
+                joined: new Date().toISOString(),
+                avatar: `https://i.pravatar.cc/96?img=${Math.floor(Math.random()*70)}`
+            };
+            
+            transactions = [{
+                id: Date.now(),
+                type: 'earn',
+                amount: 150,
+                desc: 'ওয়েলকাম বোনাস',
+                date: new Date().toISOString()
+            }];
+            
+            addNotification('স্বাগতম! আপনি ১৫০ কয়েন ওয়েলকাম বোনাস পেয়েছেন', 'reward');
+            
+            saveData();
+            enterApp();
+        }
+        
+        function enterApp() {
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            
+            // Set initial page
+            showPage('home');
+            
+            updateAllUI();
+            
+            // Welcome notification if first time
+            if (notifications.length === 0) {
+                addNotification('আপনার অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে!', 'system');
+            }
+            
+            // Check daily bonus availability
+            checkDailyBonusAvailability();
+        }
+        
+        function logoutUser() {
+            if (confirm('আপনি কি লগআউট করতে চান?')) {
+                localStorage.removeItem('tishan_user_data');
+                location.reload();
+            }
+        }
+        
+        // ==================== DAILY BONUS ====================
+        function checkDailyBonusAvailability() {
+            if (!currentUser) return;
+            
+            const today = new Date().toDateString();
+            const lastClaim = localStorage.getItem('tishan_last_daily_bonus');
+            
+            const card = document.getElementById('daily-bonus-card');
+            
+            if (lastClaim === today) {
+                if (card) {
+                    card.style.opacity = '0.6';
+                    card.style.pointerEvents = 'none';
+                    card.innerHTML = `
+                        <div class="flex items-center gap-x-4">
+                            <div class="w-12 h-12 bg-zinc-800 rounded-2xl flex items-center justify-center">
+                                <i class="fas fa-check-circle text-emerald-400 text-3xl"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold">ডেইলি বোনাস ক্লেইম করা হয়েছে</p>
+                                <p class="text-xs text-emerald-400">আগামীকাল আবার চেষ্টা করুন</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        function claimDailyBonus() {
+            if (!currentUser) return;
+            
+            const today = new Date().toDateString();
+            const lastClaim = localStorage.getItem('tishan_last_daily_bonus');
+            
+            if (lastClaim === today) {
+                alert('আজকের ডেইলি বোনাস ইতিমধ্যে নেয়া হয়েছে!');
+                return;
+            }
+            
+            earnCoins(50, 'ডেইলি লগইন বোনাস');
+            localStorage.setItem('tishan_last_daily_bonus', today);
+            
+            // Update card
+            const card = document.getElementById('daily-bonus-card');
+            if (card) {
+                card.style.transition = 'all .3s';
+                card.style.opacity = '0.5';
+                card.style.pointerEvents = 'none';
+                setTimeout(() => {
+                    if (card) card.innerHTML = `
+                        <div class="flex items-center gap-x-4">
+                            <div class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center">
+                                <i class="fas fa-check-circle text-emerald-400 text-3xl"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold">ডেইলি বোনাস ক্লেইম করা হয়েছে ✓</p>
+                                <p class="text-xs text-emerald-400">ধন্যবাদ! আগামীকাল আবার আসবেন</p>
+                            </div>
+                        </div>
+                    `;
+                }, 300);
+            }
+        }
+        
+        // ==================== DAILY TASKS ====================
+        function renderDailyTasks() {
+            const container = document.getElementById('tasks-list');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            const today = new Date().toDateString();
+            
+            DAILY_TASKS.forEach(task => {
+                const isCompleted = dailyCompleted[task.id] === today;
+                
+                const div = document.createElement('div');
+                div.className = `task-item flex items-center justify-between modern-card px-5 py-4 rounded-3xl border ${isCompleted ? 'border-emerald-900/60' : 'border-zinc-800'}`;
+                
+                div.innerHTML = `
+                    <div class="flex items-center gap-x-4">
+                        <div class="w-11 h-11 flex-shrink-0 rounded-2xl flex items-center justify-center ${isCompleted ? 'bg-emerald-500/10' : 'bg-zinc-800'}">
+                            <i class="fas ${isCompleted ? 'fa-check-circle text-emerald-400' : 'fa-tasks text-zinc-400'} text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold">${task.title}</p>
+                            <p class="text-xs text-zinc-400">${task.desc}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="text-right">
+                        ${isCompleted ? 
+                            `<div class="text-emerald-400 text-xs font-bold flex items-center justify-end gap-x-1"><i class="fas fa-check"></i> <span>সম্পন্ন</span></div>` : 
+                            `<button onclick="completeDailyTask('${task.id}', ${task.coins}, this)" class="earn-btn px-5 py-2 text-xs font-extrabold bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-2xl">+${task.coins}</button>`
+                        }
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        function completeDailyTask(taskId, coins, btnElement) {
+            const today = new Date().toDateString();
+            
+            if (dailyCompleted[taskId] === today) {
+                alert('এই টাস্ক আজকের জন্য ইতিমধ্যে সম্পন্ন!');
+                return;
+            }
+            
+            dailyCompleted[taskId] = today;
+            
+            // Disable button
+            if (btnElement) {
+                btnElement.outerHTML = `<div class="text-emerald-400 text-xs font-bold flex items-center justify-end gap-x-1"><i class="fas fa-check"></i> <span>সম্পন্ন</span></div>`;
+            }
+            
+            earnCoins(coins, `ডেইলি টাস্ক: ${taskId}`);
+            
+            // Special case for play game task
+            if (taskId === 'play_one_game') {
+                // just mark as done
+            }
+            
+            saveData();
+        }
+        
+        // New helper: Auto complete "play_one_game" task when user plays a game
+        function autoCompletePlayGameTask() {
+            const today = new Date().toDateString();
+            if (dailyCompleted['play_one_game'] === today) return;
+            
+            dailyCompleted['play_one_game'] = today;
+            saveData();
+            
+            // If tasks page is open, re-render it
+            const tasksPage = document.getElementById('page-tasks');
+            if (tasksPage && tasksPage.classList.contains('active')) {
+                renderDailyTasks();
+            }
+            
+            // Give the task coins if not already given
+            // (we don't auto-earn here to avoid double earning, user still clicks task for coins)
+        }
+        
+        // ==================== OFFERWALL ====================
+        function renderOfferwall() {
+            const container = document.getElementById('offerwall-list');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            OFFERWALL_OFFERS.forEach(offer => {
+                const isDone = completedOffers.includes(offer.id);
+                
+                const div = document.createElement('div');
+                div.className = `modern-card px-5 py-4 rounded-3xl border flex items-center justify-between ${isDone ? 'border-emerald-900/60 opacity-75' : 'border-zinc-800'}`;
+                
+                div.innerHTML = `
+                    <div class="flex items-center gap-x-4 flex-1 min-w-0">
+                        <div class="w-12 h-12 flex-shrink-0 rounded-2xl bg-amber-500/10 flex items-center justify-center">
+                            <i class="fas fa-handshake text-amber-400 text-2xl"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p class="font-semibold truncate">${offer.title}</p>
+                            <p class="text-xs text-zinc-400 truncate">${offer.desc}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="text-right ml-3 flex-shrink-0">
+                        ${isDone ? 
+                            `<span class="text-emerald-400 text-xs font-bold">সম্পন্ন ✓</span>` : 
+                            `<button onclick="startOfferTask('${offer.id}', ${offer.coins}, this)" class="earn-btn text-xs font-extrabold px-5 py-[9px] bg-amber-600 hover:bg-amber-500 active:bg-amber-700 text-white rounded-2xl whitespace-nowrap">+${offer.coins}</button>`
+                        }
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        function startOfferTask(offerId, coins, btn) {
+            if (completedOffers.includes(offerId)) return;
+            
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ভেরিফাই হচ্ছে...`;
+            btn.disabled = true;
+            
+            // Simulate verification delay (real would be server call)
+            setTimeout(() => {
+                completedOffers.push(offerId);
+                
+                earnCoins(coins, 'অফারওয়াল টাস্ক');
+                
+                // Update UI
+                btn.outerHTML = `<span class="text-emerald-400 text-xs font-bold">সম্পন্ন ✓</span>`;
+                
+                saveData();
+                
+                // Show success toast
+                showToast(`অভিনন্দন! +${coins} কয়েন যোগ হয়েছে`);
+            }, 2200);
+        }
+        
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-24 left-1/2 -translate-x-1/2 bg-zinc-800 text-white text-sm px-5 py-3 rounded-3xl shadow-xl flex items-center gap-x-2 z-[200]`;
+            toast.innerHTML = `<i class="fas fa-check-circle text-emerald-400"></i> <span>${msg}</span>`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.transition = 'all 0.3s';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 200);
+            }, 2400);
+        }
+        
+        // ==================== GAMES ====================
+        function openGameModal(gameType) {
+            const modal = document.getElementById('game-modal');
+            const tapContent = document.getElementById('tap-game-content');
+            const quizContent = document.getElementById('quiz-game-content');
+            const resultContent = document.getElementById('game-result');
+            
+            // Reset
+            tapContent.classList.add('hidden');
+            quizContent.classList.add('hidden');
+            resultContent.classList.add('hidden');
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            if (gameType === 'tap') {
+                document.getElementById('game-modal-title').innerHTML = `<i class="fas fa-hand-pointer mr-2 text-indigo-400"></i> ট্যাপ ফ্রেনজি`;
+                tapContent.classList.remove('hidden');
+                
+                // Reset tap game UI
+                document.getElementById('tap-score').textContent = '0';
+                document.getElementById('tap-timer').textContent = '20';
+                document.getElementById('tap-start-btn').classList.remove('hidden');
+                document.getElementById('tap-button').classList.add('opacity-40', 'pointer-events-none');
+                
+                currentTapGame = { score: 0, timer: null, timeLeft: 20, running: false };
+            } 
+            else if (gameType === 'quiz') {
+                document.getElementById('game-modal-title').innerHTML = `<i class="fas fa-question-circle mr-2 text-emerald-400"></i> কুইক কুইজ`;
+                quizContent.classList.remove('hidden');
+                
+                // Start quiz
+                startQuizGame();
+            }
+        }
+        
+        function closeGameModal() {
+            const modal = document.getElementById('game-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+            
+            // Cleanup any running timers
+            if (currentTapGame.timer) {
+                clearInterval(currentTapGame.timer);
+                currentTapGame.timer = null;
+            }
+        }
+        
+        // TAP GAME
+        function startTapGame() {
+            if (currentTapGame.running) return;
+            
+            const today = new Date().toDateString();
+            if ((gamePlays.tap || 0) >= 5) {
+                alert('আজকের ট্যাপ গেম লিমিট শেষ! আগামীকাল আবার খেলুন।');
+                closeGameModal();
+                return;
+            }
+            
+            currentTapGame.running = true;
+            currentTapGame.score = 0;
+            currentTapGame.timeLeft = 20;
+            
+            document.getElementById('tap-score').textContent = '0';
+            document.getElementById('tap-timer').textContent = '20';
+            document.getElementById('tap-start-btn').classList.add('hidden');
+            document.getElementById('tap-button').classList.remove('opacity-40', 'pointer-events-none');
+            
+            // Timer
+            currentTapGame.timer = setInterval(() => {
+                currentTapGame.timeLeft--;
+                document.getElementById('tap-timer').textContent = currentTapGame.timeLeft;
+                
+                if (currentTapGame.timeLeft <= 0) {
+                    endTapGame();
+                }
+            }, 1000);
+        }
+        
+        function tapGameClick() {
+            if (!currentTapGame.running) return;
+            
+            currentTapGame.score++;
+            document.getElementById('tap-score').textContent = currentTapGame.score;
+            
+            // Visual feedback
+            const btn = document.getElementById('tap-button');
+            btn.style.transform = 'scale(0.92)';
+            setTimeout(() => {
+                if (btn) btn.style.transform = 'scale(1)';
+            }, 80);
+        }
+        
+        function endTapGame() {
+            if (currentTapGame.timer) clearInterval(currentTapGame.timer);
+            currentTapGame.running = false;
+            
+            const score = currentTapGame.score;
+            let coinsEarned = Math.floor(score / 2) + 15; // base + performance
+            if (coinsEarned > 120) coinsEarned = 120;
+            
+            // Update plays
+            gamePlays.tap = (gamePlays.tap || 0) + 1;
+            
+            // Show result
+            document.getElementById('tap-game-content').classList.add('hidden');
+            const resultDiv = document.getElementById('game-result');
+            resultDiv.classList.remove('hidden');
+            
+            document.getElementById('game-result-text').innerHTML = `স্কোর: <span class="text-white">${score}</span> ট্যাপ`;
+            document.getElementById('game-result-coins').innerHTML = `+${coinsEarned} কয়েন পেয়েছেন!`;
+            
+            // Award coins
+            setTimeout(() => {
+                earnCoins(coinsEarned, 'ট্যাপ ফ্রেনজি গেম');
+                updateGamePlayCounts();
+                saveData();
+                
+                // Auto complete daily task if not done
+                autoCompletePlayGameTask();
+            }, 800);
+        }
+        
+        // QUIZ GAME
+        function startQuizGame() {
+            if ((gamePlays.quiz || 0) >= 3) {
+                alert('আজকের কুইজ লিমিট শেষ!');
+                closeGameModal();
+                return;
+            }
+            
+            currentQuiz = { index: 0, score: 0, answers: [] };
+            
+            document.getElementById('quiz-score').textContent = `স্কোর: 0`;
+            showQuizQuestion();
+        }
+        
+        function showQuizQuestion() {
+            const qIndex = currentQuiz.index;
+            const qData = QUIZ_QUESTIONS[qIndex];
+            
+            document.getElementById('quiz-progress').innerHTML = `প্রশ্ন ${qIndex + 1}/5`;
+            document.getElementById('quiz-question').innerHTML = qData.q;
+            
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            
+            const progressPercent = ((qIndex) / 5) * 100;
+            document.getElementById('quiz-progress-bar').style.width = `${progressPercent}%`;
+            
+            qData.options.forEach((option, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left px-5 py-[17px] bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-600 transition-colors rounded-2xl text-sm font-medium flex items-center`;
+                btn.innerHTML = `<span class="flex-1">${option}</span>`;
+                
+                btn.onclick = () => {
+                    // Check answer
+                    const isCorrect = idx === qData.correct;
+                    
+                    if (isCorrect) currentQuiz.score++;
+                    
+                    currentQuiz.answers.push(idx);
+                    
+                    // Visual feedback
+                    btn.style.transition = 'all .1s';
+                    if (isCorrect) {
+                        btn.classList.add('!bg-emerald-600', '!text-white');
+                    } else {
+                        btn.classList.add('!bg-red-600/80', '!text-white');
+                        
+                        // Show correct one
+                        setTimeout(() => {
+                            const allBtns = optionsContainer.querySelectorAll('button');
+                            allBtns[qData.correct].classList.add('!bg-emerald-600', '!text-white');
+                        }, 180);
+                    }
+                    
+                    // Disable all
+                    optionsContainer.querySelectorAll('button').forEach(b => b.disabled = true);
+                    
+                    setTimeout(() => {
+                        currentQuiz.index++;
+                        
+                        if (currentQuiz.index < QUIZ_QUESTIONS.length) {
+                            showQuizQuestion();
+                        } else {
+                            finishQuiz();
+                        }
+                    }, isCorrect ? 650 : 1100);
+                };
+                
+                optionsContainer.appendChild(btn);
+            });
+            
+            document.getElementById('quiz-score').textContent = `স্কোর: ${currentQuiz.score}`;
+        }
+        
+        function finishQuiz() {
+            const finalScore = currentQuiz.score;
+            let coins = 50 + (finalScore * 20); // 50 base + 20 per correct
+            if (finalScore === 5) coins += 30; // perfect bonus
+            
+            gamePlays.quiz = (gamePlays.quiz || 0) + 1;
+            
+            // Hide quiz content, show result
+            document.getElementById('quiz-game-content').classList.add('hidden');
+            const resultDiv = document.getElementById('game-result');
+            resultDiv.classList.remove('hidden');
+            
+            let message = `স্কোর: ${finalScore}/5`;
+            if (finalScore === 5) message = `পারফেক্ট! ${finalScore}/5`;
+            
+            document.getElementById('game-result-text').innerHTML = message;
+            document.getElementById('game-result-coins').innerHTML = `+${coins} কয়েন পেয়েছেন!`;
+            
+            setTimeout(() => {
+                earnCoins(coins, 'কুইক কুইজ গেম');
+                updateGamePlayCounts();
+                saveData();
+                
+                // Auto complete daily task if not done
+                autoCompletePlayGameTask();
+            }, 900);
+        }
+        
+        // ==================== WITHDRAW ====================
+        let currentWithdrawSelection = null;
+        
+        function selectWithdrawOption(taka, coinsNeeded) {
+            if (!currentUser || currentUser.coins < coinsNeeded) {
+                alert(`আপনার পর্যাপ্ত কয়েন নেই! ${coinsNeeded} কয়েন প্রয়োজন।`);
+                return;
+            }
+            
+            currentWithdrawSelection = { taka, coins: coinsNeeded };
+            
+            // Show form
+            document.getElementById('withdraw-form').classList.remove('hidden');
+            
+            document.getElementById('withdraw-amount-text').textContent = `${taka} টাকা`;
+            document.getElementById('withdraw-coins-text').textContent = coinsNeeded;
+            
+            // Scroll to form
+            document.getElementById('withdraw-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        function cancelWithdraw() {
+            document.getElementById('withdraw-form').classList.add('hidden');
+            currentWithdrawSelection = null;
+        }
+        
+        function submitWithdrawRequest() {
+            if (!currentWithdrawSelection || !currentUser) return;
+            
+            const mobile = document.getElementById('withdraw-mobile').value.trim();
+            const operator = document.getElementById('withdraw-operator').value;
+            
+            if (!mobile || mobile.length < 10) {
+                alert('সঠিক মোবাইল নম্বর দিন');
+                return;
+            }
+            
+            const { taka, coins } = currentWithdrawSelection;
+            
+            // Deduct coins immediately (hold)
+            currentUser.coins -= coins;
+            
+            // Create request
+            const request = {
+                id: Date.now(),
+                userId: currentUser.id,
+                amountTaka: taka,
+                coinsNeeded: coins,
+                mobile: mobile,
+                operator: operator,
+                status: 'pending',
+                date: new Date().toISOString()
+            };
+            
+            withdrawRequests.push(request);
+            
+            // Add transaction record
+            addTransaction('withdraw', coins, `উইথড্র রিকোয়েস্ট: ${taka} টাকা (${mobile})`);
+            
+            addNotification(`${taka} টাকা রিচার্জের রিকোয়েস্ট পেন্ডিং আছে`, 'system');
+            
+            saveData();
+            updateAllUI();
+            
+            // Hide form & reset
+            document.getElementById('withdraw-form').classList.add('hidden');
+            currentWithdrawSelection = null;
+            
+            // Success message
+            showToast(`রিকোয়েস্ট সাবমিট হয়েছে! অ্যাডমিন রিভিউ করবে।`);
+            
+            // Go to wallet
+            setTimeout(() => {
+                showPage('wallet');
+            }, 1400);
+        }
+        
+        // ==================== REFERRAL ====================
+        function copyReferralCode() {
+            if (!currentUser) return;
+            
+            const code = currentUser.referralCode;
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = event.currentTarget ? event.currentTarget.innerHTML : '';
+                showToast('রেফারেল কোড কপি হয়েছে!');
+            }).catch(() => {
+                // Fallback
+                prompt('আপনার রেফারেল কোড:', code);
+            });
+        }
+        
+        function simulateReferralJoin() {
+            if (!currentUser) return;
+            
+            // Simulate new user joined with referral
+            const bonus = 100;
+            
+            earnCoins(bonus, 'রেফারেল বোনাস (নতুন ইউজার)');
+            
+            // Update referral stats (demo)
+            const countEl = document.getElementById('referral-count');
+            if (countEl) {
+                let current = parseInt(countEl.textContent) || 7;
+                countEl.textContent = `${current + 1} জন`;
+            }
+            
+            const earnedEl = document.getElementById('referral-earned');
+            if (earnedEl) {
+                let currentEarned = parseInt(earnedEl.textContent.replace(/\D/g, '')) || 700;
+                earnedEl.textContent = `+${currentEarned + bonus} কয়েন`;
+            }
+            
+            addNotification('নতুন বন্ধু আপনার রেফারেল কোড ব্যবহার করে জয়েন করেছে!', 'reward');
+            
+            // Bonus to leaderboard simulation
+            setTimeout(() => {
+                renderLeaderboard();
+            }, 500);
+        }
+        
+        // ==================== LEADERBOARD ====================
+        function renderLeaderboard() {
+            const container = document.getElementById('leaderboard-list');
+            if (!container || !currentUser) return;
+            
+            container.innerHTML = '';
+            
+            // Fake top users + current user
+            let leaders = [
+                { name: 'রাহুল খান', coins: 12480, level: 22, isCurrent: false },
+                { name: 'সাবিনা ইসলাম', coins: 9870, level: 18, isCurrent: false },
+                { name: currentUser.name || 'আপনি', coins: currentUser.coins || 1240, level: currentUser.level || 8, isCurrent: true },
+                { name: 'আরিফ হোসেন', coins: 7650, level: 14, isCurrent: false },
+                { name: 'নুসরাত জাহান', coins: 6320, level: 12, isCurrent: false },
+            ];
+            
+            // Sort by coins
+            leaders.sort((a, b) => b.coins - a.coins);
+            
+            leaders.forEach((leader, index) => {
+                const rank = index + 1;
+                const isYou = leader.isCurrent;
+                
+                const div = document.createElement('div');
+                div.className = `leaderboard-row flex items-center justify-between px-5 py-[13px] rounded-2xl ${isYou ? 'bg-indigo-950/60 border border-indigo-500/40' : 'bg-zinc-900 border border-zinc-800'}`;
+                
+                let medal = '';
+                if (rank === 1) medal = `<i class="fas fa-trophy text-yellow-400"></i>`;
+                else if (rank === 2) medal = `<i class="fas fa-medal text-zinc-300"></i>`;
+                else if (rank === 3) medal = `<i class="fas fa-medal text-amber-600"></i>`;
+                else medal = `<span class="font-mono text-xs w-4 text-center">#${rank}</span>`;
+                
+                div.innerHTML = `
+                    <div class="flex items-center gap-x-4">
+                        <div class="w-8 text-center">${medal}</div>
+                        <div>
+                            <span class="font-semibold">${leader.name}</span>
+                            ${isYou ? '<span class="ml-2 text-xs px-2 py-px bg-indigo-500/20 text-indigo-400 rounded">আপনি</span>' : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="text-right">
+                        <div class="font-extrabold tabular-nums">${leader.coins.toLocaleString()}</div>
+                        <div class="text-xs text-zinc-400 -mt-0.5">Level ${leader.level}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        function switchLeaderboardTab(element, period) {
+            // Deselect all
+            document.querySelectorAll('.leaderboard-tab').forEach(el => {
+                el.classList.remove('active', 'bg-white', 'text-zinc-900', 'shadow');
+                el.classList.add('text-zinc-400');
+            });
+            
+            // Select current
+            element.classList.add('active', 'bg-white', 'text-zinc-900', 'shadow');
+            element.classList.remove('text-zinc-400');
+            
+            // In real app would filter data, here just re-render same for demo
+            renderLeaderboard();
+        }
+        
+        // ==================== NOTIFICATIONS ====================
+        function showNotifications() {
+            const modal = document.getElementById('notifications-modal');
+            const listContainer = document.getElementById('notifications-list');
+            
+            listContainer.innerHTML = '';
+            
+            if (notifications.length === 0) {
+                listContainer.innerHTML = `<div class="px-4 py-8 text-center text-zinc-400 text-sm">কোনো নোটিফিকেশন নেই</div>`;
+            } else {
+                notifications.forEach(notif => {
+                    const div = document.createElement('div');
+                    div.className = `notification-item flex gap-x-3 px-4 py-3.5 rounded-2xl bg-zinc-800/70`;
+                    
+                    let icon = 'fa-bell text-zinc-400';
+                    if (notif.type === 'reward') icon = 'fa-coins text-emerald-400';
+                    if (notif.type === 'level') icon = 'fa-tachometer-alt text-indigo-400';
+                    
+                    div.innerHTML = `
+                        <div class="mt-1"><i class="fas ${icon}"></i></div>
+                        <div class="flex-1 text-sm">
+                            <div>${notif.message}</div>
+                            <div class="text-xs text-zinc-500 mt-0.5">${notif.time}</div>
+                        </div>
+                    `;
+                    listContainer.appendChild(div);
+                });
+            }
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        
+        function hideNotifications() {
+            const modal = document.getElementById('notifications-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+        
+        // ==================== ADMIN PANEL ====================
+        function showAdminPanel() {
+            const modal = document.getElementById('admin-modal');
+            const listContainer = document.getElementById('admin-withdraw-list');
+            
+            // Simple password for demo (in real would be proper auth)
+            const pass = prompt('অ্যাডমিন পাসওয়ার্ড দিন (ডেমো: tishan123)');
+            if (pass !== 'tishan123') {
+                alert('ভুল পাসওয়ার্ড!');
+                return;
+            }
+            
+            listContainer.innerHTML = '';
+            
+            const pending = withdrawRequests.filter(r => r.status === 'pending');
+            
+            if (pending.length === 0) {
+                listContainer.innerHTML = `<div class="text-xs text-center py-4 text-zinc-400">কোনো পেন্ডিং রিকোয়েস্ট নেই</div>`;
+            } else {
+                pending.forEach(req => {
+                    const div = document.createElement('div');
+                    div.className = `bg-zinc-800 px-4 py-3 rounded-2xl text-xs mb-2`;
+                    div.innerHTML = `
+                        <div class="flex justify-between">
+                            <div>
+                                <span class="font-bold">${req.amountTaka} টাকা</span> → ${req.mobile}<br>
+                                <span class="text-zinc-400">${req.operator} • ${new Date(req.date).toLocaleDateString('bn-BD')}</span>
+                            </div>
+                            <div class="flex flex-col gap-y-1 items-end">
+                                <button onclick="approveWithdraw(${req.id}, this)" class="text-emerald-400 hover:text-emerald-300 text-xs font-bold">অ্যাপ্রুভ</button>
+                                <button onclick="rejectWithdraw(${req.id}, this)" class="text-red-400 hover:text-red-300 text-xs">রিজেক্ট</button>
+                            </div>
+                        </div>
+                    `;
+                    listContainer.appendChild(div);
+                });
+            }
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        
+        function hideAdminPanel() {
+            const modal = document.getElementById('admin-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+        
+        function approveWithdraw(requestId, btn) {
+            const reqIndex = withdrawRequests.findIndex(r => r.id === requestId);
+            if (reqIndex === -1) return;
+            
+            const req = withdrawRequests[reqIndex];
+            req.status = 'approved';
+            
+            addNotification(`${req.amountTaka} টাকা রিচার্জ সফলভাবে সম্পন্ন হয়েছে!`, 'system');
+            
+            // Note: Transaction was already added when request was submitted.
+            // No duplicate added here to keep history clean.
+            
+            // Update UI
+            btn.parentElement.innerHTML = `<span class="text-emerald-400 text-xs font-bold">অ্যাপ্রুভড ✓</span>`;
+            
+            saveData();
+            updateAllUI();
+        }
+        
+        function rejectWithdraw(requestId, btn) {
+            const reqIndex = withdrawRequests.findIndex(r => r.id === requestId);
+            if (reqIndex === -1) return;
+            
+            const req = withdrawRequests[reqIndex];
+            req.status = 'rejected';
+            
+            // Refund coins
+            if (currentUser) {
+                currentUser.coins += req.coinsNeeded;
+            }
+            
+            addNotification(`${req.amountTaka} টাকার রিকোয়েস্ট রিজেক্ট হয়েছে (রিফান্ড হয়েছে)`, 'system');
+            
+            btn.parentElement.innerHTML = `<span class="text-red-400 text-xs font-bold">রিজেক্টেড</span>`;
+            
+            saveData();
+            updateAllUI();
+        }
+        
+        // ==================== INITIALIZATION ====================
+        function initializeApp() {
+            initTailwind();
+            
+            // Immediately hide everything except splash for clean start (prevents stacking)
+            const splashEl = document.getElementById('splash-screen');
+            const authEl = document.getElementById('auth-screen');
+            const mainEl = document.getElementById('main-app');
+            
+            if (authEl) authEl.classList.add('hidden');
+            if (mainEl) mainEl.classList.add('hidden');
+            
+            // Hide splash after delay
+            setTimeout(() => {
+                if (splashEl) {
+                    splashEl.style.transition = 'opacity 0.4s ease';
+                    splashEl.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        if (splashEl) splashEl.style.display = 'none';
+                        
+                        // Check if already logged in
+                        loadData();
+                        
+                        if (currentUser) {
+                            // Auto login
+                            if (authEl) authEl.classList.add('hidden');
+                            if (mainEl) mainEl.classList.remove('hidden');
+                            showPage('home');
+                            updateAllUI();
+                            
+                            // Check daily bonus + reset daily game limits
+                            checkDailyBonusAvailability();
+                            resetDailyGamePlaysIfNeeded();
+                        } else {
+                            // Show auth
+                            if (authEl) authEl.classList.remove('hidden');
+                        }
+                    }, 400);
+                }
+            }, 1650);
+            
+            // Keyboard support for demo
+            document.addEventListener('keydown', function(e) {
+                if (e.key === '?' && mainEl && !mainEl.classList.contains('hidden')) {
+                    e.preventDefault();
+                    showPage('home');
+                }
+            });
+            
+            // Make sure initial nav is correct
+            setTimeout(() => {
+                const homeNav = document.getElementById('nav-home');
+                if (homeNav) homeNav.classList.add('active', 'text-indigo-400');
+            }, 1800);
+            
+            console.log('%c[Tishan Rewards] Demo prototype initialized successfully', 'color:#52525b');
+        }
+        
+        // ==================== NEW: Daily Game Reset ====================
+        function resetDailyGamePlaysIfNeeded() {
+            const lastDate = localStorage.getItem('tishan_last_game_play_date');
+            const today = new Date().toDateString();
+            
+            if (lastDate !== today) {
+                gamePlays = { tap: 0, quiz: 0 };
+                localStorage.setItem('tishan_last_game_play_date', today);
+                saveData();
+                updateGamePlayCounts();
+            }
+        }
+        
+        // Boot the app
+        window.onload = initializeApp;
+    </script>
+</body>
+</html>
